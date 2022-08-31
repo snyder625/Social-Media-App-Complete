@@ -5,6 +5,28 @@ import Logo from '../../img/logo.png'
 const Auth = () => {
 
     const [isSignUp, setIsSignUp] = useState(true);
+    const [data, setData] = useState({firstname: "", lastname: "", username: "", password: "", confirmpassword: ""});
+    const [confirmPass, setConfirmPass] = useState(true);
+
+    const handleChange = (e) => {
+        setData({...data, [e.target.name]: e.target.value});
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (isSignUp) {
+            if (data.password !== data.confirmpassword) {
+                setConfirmPass(false);
+            }
+        
+        }
+    }
+
+    const resetForm = () => {
+        setConfirmPass(true);
+        setData({firstname: "", lastname: "", username: "", password: "", confirmpassword: ""});
+    }
 
   return (
     <div className="Auth">
@@ -19,34 +41,42 @@ const Auth = () => {
 
         {/* Right Side */}
         <div className="a-right">
-            <form className="infoForm authForm">
+            <form className="infoForm authForm" onSubmit={handleSubmit}>
 
                 <h3>{isSignUp? "Sign Up" : "Log In"}</h3>
                 {isSignUp &&
                 <div>
                     <input type="text" placeholder="First Name" 
-                    className="FormInput" name="firstname"/>
+                    className="FormInput" name="firstname" 
+                    value={data.firstname} onChange={handleChange}/>
                     <input type="text" placeholder="Last Name" 
-                    className="FormInput" name="Lastname"/>
+                    className="FormInput" name="lastname" 
+                    value={data.lastname}onChange={handleChange}/>
                 </div>
                 }
                 <div>
                     <input type="text" placeholder="Username" 
-                    className="FormInput" name="username"/>
+                    className="FormInput" name="username" 
+                    value={data.username}onChange={handleChange}/>
                 </div>
                 <div>
                     <input type="password" placeholder="Password" 
-                    className="FormInput" name="password"/>
+                    className="FormInput" name="password" 
+                    value={data.password} onChange={handleChange}/>
                     {isSignUp &&
                     <input type="password" placeholder="Confirm Password" 
-                    className="FormInput" name="confirmpassword"/>
+                    className="FormInput" name="confirmpassword" 
+                    value={data.confirmpassword} onChange={handleChange}/>
                     }
                 </div>
+                <span style={{display: confirmPass? 'none': 'block', color: 'red', fontSize: '12px'}}>
+                    Confirm Password is not same
+                </span>
 
                 <button className="Button SignUpButton" type="submit">{isSignUp?"Sign Up": "Log In"}</button>
                 
                 <div>
-                    <span style={{fontSize: '15px', cursor: "pointer"}} onClick={()=>setIsSignUp((prev)=>!prev)}>
+                    <span style={{fontSize: '15px', cursor: "pointer"}} onClick={()=>{setIsSignUp((prev)=>!prev); resetForm()}}>
                     {isSignUp? "Already have an account? Login" : "Don't have an account? Signup"}
                     </span>
                 </div>
