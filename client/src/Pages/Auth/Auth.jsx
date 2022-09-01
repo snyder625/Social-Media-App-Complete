@@ -1,9 +1,14 @@
 import {useState, React} from 'react'
+import {useDispatch, useSelector} from 'react-redux'
+import {logIn, signUp} from '../../actions/AuthAction.js'
 import './Auth.css'
 import Logo from '../../img/logo.png'
 
 const Auth = () => {
 
+    const dispatch = useDispatch();
+    const loading = useSelector((state)=>state.authReducer.loading);
+    console.log(loading)
     const [isSignUp, setIsSignUp] = useState(true);
     const [data, setData] = useState({firstname: "", lastname: "", username: "", password: "", confirmpassword: ""});
     const [confirmPass, setConfirmPass] = useState(true);
@@ -16,10 +21,9 @@ const Auth = () => {
         e.preventDefault();
 
         if (isSignUp) {
-            if (data.password !== data.confirmpassword) {
-                setConfirmPass(false);
-            }
-        
+            (data.password === data.confirmpassword)? dispatch(signUp(data)): setConfirmPass(false);
+        } else {
+            dispatch(logIn(data));
         }
     }
 
@@ -73,7 +77,8 @@ const Auth = () => {
                     Confirm Password is not same
                 </span>
 
-                <button className="Button SignUpButton" type="submit">{isSignUp?"Sign Up": "Log In"}</button>
+                <button className="Button SignUpButton" type="submit" disabled={loading}>
+                {loading? "Loading...":isSignUp?"Sign Up": "Log In"}</button>
                 
                 <div>
                     <span style={{fontSize: '15px', cursor: "pointer"}} onClick={()=>{setIsSignUp((prev)=>!prev); resetForm()}}>
