@@ -1,4 +1,4 @@
-import {usestate, useEffect, React} from 'react'
+import {useState, useEffect, React} from 'react'
 import './Posts.css'
 import Post from '../Post/Post'
 import {useDispatch, useSelector} from 'react-redux'
@@ -15,7 +15,7 @@ const Posts = () => {
 
   return (
     <div className="Posts">
-        {posts.map((post, id)=> {
+        {loading? "Loading Posts...": posts.map((post, id)=> {
             return <Post data={post} id={id}/>
         })}
     </div>
