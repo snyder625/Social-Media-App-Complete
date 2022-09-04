@@ -26,7 +26,8 @@ const UserSchema = mongoose.Schema({
     about: 'string',
     livesIn: 'string',
     worksAt: 'string',
-    relationships: 'string',
+    relationship: 'string',
+    country: String,
     followers: [],
     following: []
 }, {timestamps: true}

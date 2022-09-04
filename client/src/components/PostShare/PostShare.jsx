@@ -10,6 +10,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {uploadImage, uploadPost} from '../../actions/uploadAction.js'
 
 const PostShare = () => {
+    const serverPublic = process.env.REACT_APP_PUBLIC_FOLDER
     const loading = useSelector((state)=>state.postReducer.uploading)
     const dispatch = useDispatch();
 
@@ -59,7 +60,7 @@ const PostShare = () => {
 
   return (
     <div className="PostShare">
-        <img src={Profile} alt="" />
+        <img src={user.profilePicture?serverPublic + user.profilePicture: serverPublic + "defaultProfile.png"} alt="" />
         <div>
             <input ref={desc} required type="text" placeholder="What's happening?"></input>
             <div className="PostOptions">
