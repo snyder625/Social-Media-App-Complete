@@ -1,6 +1,5 @@
 import React, {useState, useRef} from 'react'
 import './PostShare.css'
-import Profile from '../../img/profileImg.jpg'
 import {UilScenery} from '@iconscout/react-unicons'
 import {UilPlayCircle} from '@iconscout/react-unicons'
 import {UilLocationPoint} from '@iconscout/react-unicons'
@@ -37,6 +36,7 @@ const PostShare = () => {
 
         const newPost = {
             userId: user._id,
+            username: user.username,
             desc: desc.current.value
         }
         if (image) {

@@ -15,11 +15,10 @@ const Post = ({data}) => {
   const [likes, setLikes] = useState(data.likes.length)
 
   const handleLike = () => {
-    console.log(data.likes.includes(user._id))
     likePost(data._id, user._id);
     setLiked((prev) => !prev);
     liked? setLikes((prev)=>prev-1): setLikes((prev)=>prev+1)
-    console.log(data.likes.includes(user._id))
+    console.log(data)
   };
 
   return (
@@ -35,7 +34,7 @@ const Post = ({data}) => {
         <span style={{color:'var(--gray)', fontSize:'16px'}}>{likes} Likes</span>
 
         <div className="Detail">
-            <span><b>{data.name}</b></span>
+            <span><b>{data.username}</b></span>
             <span> {data.desc}</span>
         </div>
     </div>

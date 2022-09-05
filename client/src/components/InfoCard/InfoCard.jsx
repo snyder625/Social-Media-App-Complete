@@ -46,16 +46,16 @@ const InfoCard = () => {
             ): ""}
         </div>
         <div className="Info">
-            <span><b>Status </b></span>
-            <span>{profileUser.relationshipStatus}</span>
-        </div>
-        <div className="Info">
             <span><b>Lives in </b></span>
             <span>{profileUser.livesIn}</span>
         </div>
         <div className="Info">
             <span><b>Works at </b></span>
             <span>{profileUser.worksAt}</span>
+        </div>
+        <div className="Info">
+            <span><b>Relationship Status </b></span>
+            <span>{profileUser.relationship}</span>
         </div>
 
         <button className="Button l-button" onClick={handleLogout}>Logout</button>

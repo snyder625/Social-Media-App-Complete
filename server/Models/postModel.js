@@ -5,6 +5,7 @@ const postSchema = mongoose.Schema({
         type: 'string',
         required: true
     },
+    username: 'string',
     desc: 'string',
     likes: [],
     image: 'string'

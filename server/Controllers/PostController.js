@@ -71,13 +71,13 @@ export const likePost = async (req, res) => {
 
     try {
         const post = await PostModel.findById(id);
-        if (!post.likes.includes(userId)) {
-            await post.updateOne({$push: {likes: userId}});
-            res.status(200).json("Post Liked successfully");
-        }
-        else {
+        if (post.likes.includes(userId)) {
             await post.updateOne({$pull: {likes: userId}});
             res.status(200).json("Post Unliked successfully");
+        }
+        else {
+            await post.updateOne({$push: {likes: userId}});
+            res.status(200).json("Post Liked successfully");          
         }
     } catch (error) {
         res.status(500).json(error);
