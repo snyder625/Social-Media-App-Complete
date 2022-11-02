@@ -1,5 +1,6 @@
 import React, {useState, useRef} from 'react'
 import './PostShare.css'
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import {UilScenery} from '@iconscout/react-unicons'
 import {UilPlayCircle} from '@iconscout/react-unicons'
 import {UilLocationPoint} from '@iconscout/react-unicons'
@@ -7,6 +8,7 @@ import {UilSchedule} from '@iconscout/react-unicons'
 import {UilTimes} from '@iconscout/react-unicons'
 import {useDispatch, useSelector} from 'react-redux';
 import {uploadImage, uploadPost} from '../../actions/uploadAction.js'
+import app from '../../firebase';
 
 const PostShare = () => {
     const serverPublic = process.env.REACT_APP_PUBLIC_FOLDER
@@ -14,6 +16,7 @@ const PostShare = () => {
     const dispatch = useDispatch();
 
     const [image, setImage] = useState();
+    const [inputs, setInputs] = ({});
     const imageRef = useRef();
     const desc = useRef();
     const {user} = useSelector((state)=>state.authReducer.authData)
@@ -40,12 +43,45 @@ const PostShare = () => {
             desc: desc.current.value
         }
         if (image) {
-            const data = new FormData();
+            const storage = getStorage(app);
             const filename = Date.now() + image.name;
-            data.append("name", filename)
-            data.append("file", image)
+            const storageRef = ref(storage, filename);
+            const data = new FormData();
 
-            newPost.image = filename;
+            const uploadTask = uploadBytesResumable(storageRef, image);
+
+            uploadTask.on('state_changed', 
+            (snapshot) => {
+                // Observe state change events such as progress, pause, and resume
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log('Upload is ' + progress + '% done');
+                switch (snapshot.state) {
+                case 'paused':
+                    console.log('Upload is paused');
+                    break;
+                case 'running':
+                    console.log('Upload is running');
+                    break;
+                default:
+                    break;
+                }
+            }, 
+            (error) => {
+                // Handle unsuccessful uploads
+              }, 
+              () => {
+                // Handle successful uploads on complete
+                // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                    downloadUrl = downloadURL;
+                  console.log('File available at', downloadURL);
+                });
+              }
+            );
+
+            
+            newPost.image = downloadUrl;
             console.log(newPost)
             try {
                 dispatch(uploadImage(data))
