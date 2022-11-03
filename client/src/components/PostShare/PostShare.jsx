@@ -15,23 +15,58 @@ const PostShare = () => {
     const loading = useSelector((state)=>state.postReducer.uploading)
     const dispatch = useDispatch();
 
-    const [image, setImage] = useState();
-    const [inputs, setInputs] = ({});
-    const imageRef = useRef();
+    const [input, setInput] = useState();
+    const [imageUrl, setImageUrl] = useState();
+    const inputRef = useRef();
     const desc = useRef();
     const {user} = useSelector((state)=>state.authReducer.authData)
 
-    const onImageChange= (event) => {
+    const onInputChange= (event) => {
         if(event.target.files && event.target.files[0]) {
             let img = event.target.files[0];
-            setImage(img)
+            setInput(img)
         }
 
     };
 
     const reset = () => {
-        setImage(null);
+        setInput(null);
         desc.current.value = "";
+    };
+
+
+    const uploadFile = (file, urlType)=> {
+        const storage = getStorage(app);
+        const fileName = new Date().getTime() + file.name;
+        const storageRef = ref(storage, fileName);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        uploadTask.on('state_changed', (snapshot) => {
+    // Observe state change events such as progress, pause, and resume
+    // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        switch (snapshot.state) {
+        case 'paused':
+            console.log('Upload is paused');
+            break;
+        case 'running':
+            console.log('Upload is running');
+            break;
+        default:
+            break;
+        }
+    }, 
+    (error) => {
+        // Handle unsuccessful uploads
+    },
+    () => {
+        // Handle successful uploads on complete
+        // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            setImageUrl(downloadURL);
+        console.log('File available at', downloadURL);
+        });
+    })
     };
 
     const handleSubmit =(e)=> {
@@ -41,54 +76,14 @@ const PostShare = () => {
             userId: user._id,
             username: user.username,
             desc: desc.current.value
-        }
-        if (image) {
-            const storage = getStorage(app);
-            const filename = Date.now() + image.name;
-            const storageRef = ref(storage, filename);
-            const data = new FormData();
-
-            const uploadTask = uploadBytesResumable(storageRef, image);
-
-            uploadTask.on('state_changed', 
-            (snapshot) => {
-                // Observe state change events such as progress, pause, and resume
-                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log('Upload is ' + progress + '% done');
-                switch (snapshot.state) {
-                case 'paused':
-                    console.log('Upload is paused');
-                    break;
-                case 'running':
-                    console.log('Upload is running');
-                    break;
-                default:
-                    break;
-                }
-            }, 
-            (error) => {
-                // Handle unsuccessful uploads
-              }, 
-              () => {
-                // Handle successful uploads on complete
-                // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                    downloadUrl = downloadURL;
-                  console.log('File available at', downloadURL);
-                });
-              }
-            );
-
-            
-            newPost.image = downloadUrl;
+        }           
+            newPost.image = imageUrl;
             console.log(newPost)
             try {
-                dispatch(uploadImage(data))
+                dispatch(uploadImage(imageUrl))
             } catch (error) {
                 console.log(error)
             }
-        }
         dispatch(uploadPost(newPost));
         reset();
     }
@@ -101,11 +96,12 @@ const PostShare = () => {
             <input ref={desc} required type="text" placeholder="What's happening?"></input>
             <div className="PostOptions">
                 <div className="Option" style={{color: 'var(--photo)'}}
-                onClick={()=> imageRef.current.click()}>
+                onClick={()=> inputRef.current.click()}>
                     <UilScenery />
                     Photo
                 </div>
-                <div className="Option" style={{color: 'var(--video)'}}>
+                <div className="Option" style={{color: 'var(--video)'}}
+                onClick={()=> inputRef.current.click()}>
                     <UilPlayCircle />
                     Video
                 </div>
@@ -121,13 +117,13 @@ const PostShare = () => {
                     {loading?"Uploading...":"Share"}
                 </button>
                 <div style={{display: 'none'}}>
-                    <input type="file" name="myImage" ref={imageRef} onChange={onImageChange} />
+                    <input type="file" name="myImage" ref={inputRef} onChange={onInputChange} />
                 </div>
             </div>
-            {image && (
+            {input && (
                 <div className="previewImage">
-                    <UilTimes onClick={()=>{setImage(null)}}/>
-                    <img src={URL.createObjectURL(image)} alt=""></img>
+                    <UilTimes onClick={()=>{setInput(null)}}/>
+                    <img src={URL.createObjectURL(input)} alt=""></img>
                 </div>
             )}
 
